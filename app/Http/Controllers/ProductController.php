@@ -28,6 +28,15 @@ class ProductController extends Controller
             'product_image' => 'required',
         ]);
 
+        if ($request->hasFile('product_image'))  
+        {
+            $destination_path = 'public/product_image';
+            $image = $request->file('product_image');
+            $image_name = time().'_'.$image->getClientOriginalName();
+            $path = $request->file('product_image')->storeAs($destination_path,$image_name);
+
+            $validateData['product_image'] = $image_name;
+        }      
         $product = Product::create($validateData);
         return response()->json($product, 201);
     }
@@ -38,15 +47,6 @@ class ProductController extends Controller
     public function show(string $id)
 {
     $product = Product::find($id);
-
-    if ($product) {
-        // Convert blob to base64
-        $product->image = base64_encode($product->image);
-
-        return response()->json($product, 200);
-    } else {
-        return response()->json(['message' => 'Product not found'], 404);
-    }
 }
 
     /**
